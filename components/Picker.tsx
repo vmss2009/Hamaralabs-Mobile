@@ -4,22 +4,24 @@ import tw from 'twrnc';
 
 const { height: screenHeight } = Dimensions.get('window');
 
-const CustomPicker = ({ selectedValue, onValueChange, data, placeholder, style }: {
+const CustomPicker = ({ selectedValue, onValueChange, onDataValueChange, data, placeholder, style }: {
     selectedValue: string,
     onValueChange: (itemValue: string) => void,
-    data: string[],
+    onDataValueChange?: (itemValue: any) => void,
+    data: { label: string, value: string, value2?: any}[],
     placeholder?: string,
     style?: any,
 }) => {
     const [isModalVisible, setModalVisible] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
 
-    const handleItemPress = (itemValue: string) => {
+    const handleItemPress = (itemValue: string, itemValue2: any) => {
         onValueChange(itemValue);
+        onDataValueChange && onDataValueChange(itemValue2);
         setModalVisible(false);
     };
 
-    const filteredData = data.filter(item => item.toLowerCase().includes(searchQuery.toLowerCase()));
+    const filteredData = data.filter(item => item.label.toLowerCase().includes(searchQuery.toLowerCase()));
 
     useEffect(() => {
         setSearchQuery("");
@@ -32,7 +34,7 @@ const CustomPicker = ({ selectedValue, onValueChange, data, placeholder, style }
                 style={[tw`border border-gray-300 rounded-lg p-3 bg-white mb-2`, style]}
             >
                 <Text style={tw`text-lg ${selectedValue ? "text-gray-950" : "text-neutral-500"}`}>
-                    {selectedValue || placeholder || "Select an option"}
+                    {data.find(item => item.value === selectedValue)?.label || placeholder || "Select an option"}
                 </Text>
             </TouchableOpacity>
 
@@ -63,10 +65,10 @@ const CustomPicker = ({ selectedValue, onValueChange, data, placeholder, style }
                                 keyExtractor={(item, index) => index.toString()}
                                 renderItem={({ item }) => (
                                     <TouchableOpacity
-                                        onPress={() => handleItemPress(item)}
+                                        onPress={() => handleItemPress(item.value, item?.value2)}
                                         style={tw`p-3 border-b border-gray-200`}
                                     >
-                                        <Text style={tw`text-lg`}>{item}</Text>
+                                        <Text style={tw`text-lg`}>{item.label}</Text>
                                     </TouchableOpacity>
                                 )}
                                 ListEmptyComponent={

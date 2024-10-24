@@ -11,7 +11,7 @@ const Index = () => {
     const router = useRouter();
     
     const [user, setUser] = useState<any>();
-    const [userRole, setUserRole] = useState<any>("");
+    const [userData, setUserData] = useState<any>("");
 
     useEffect(() => {
         onAuthStateChanged(auth, async (newUser) => {
@@ -21,9 +21,8 @@ const Index = () => {
                 onSnapshot(ref, async (docSnap) => {
                     if (docSnap.exists()) {
                         let data = docSnap.data();
-                     if (data && data.role !== undefined) {
-                            let role = data.role;
-                            setUserRole(role);
+                        if (data) {
+                            setUserData(data);
                         } else {
                             console.error('Role is undefined or does not exist in the document');
                         }
@@ -42,13 +41,15 @@ const Index = () => {
             {
                 user ?
                 <View style={{ marginTop: 15 }}>
-                    <Text style={tw`text-xl font-extrabold mb-6`}>Welcome, {user.email}!</Text>
-                    <Text style={tw`text-lg font-semibold mb-10`}>You are {userRole && userRole}.</Text>
+                    <Text style={tw`text-xl font-extrabold mb-6`}>Welcome, {userData.name}!</Text>
                     <View style={tw`mb-5`}>
-                        <Button title="Open School Form" onPress={() => router.push("/school-data/form")} />
+                        <Button title="Student snapshot" onPress={() => router.replace("/student-snapshot/snapshot")} />
                     </View>
                     <View style={tw`mb-5`}>
-                        <Button title="Open School Report" onPress={() => router.push("/school-data/report")} />
+                        <Button title="Chats" onPress={() => router.replace("/chat/dashboard")} />
+                    </View>
+                    <View style={tw`mb-5`}>
+                        <Button title="Payments" onPress={() => router.replace("/payments/payments")} />
                     </View>
                     <View>
                         <Button title="Logout" onPress={() => auth.signOut()} />

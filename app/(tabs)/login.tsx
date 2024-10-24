@@ -2,6 +2,8 @@ import auth from '@/firebase/auth';
 import { StatusBar } from 'expo-status-bar';
 import { useRouter } from 'expo-router';
 import { signInWithEmailAndPassword } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+import db from '@/firebase/firestore';
 import React, { useState } from 'react';
 import { View, Text, TextInput, Linking, TouchableOpacity, Alert, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import tw from 'twrnc';
@@ -23,11 +25,24 @@ const Login = () => {
         }
 
         await signInWithEmailAndPassword(auth, email, password)
-        .then(async () => {
-            await Alert.alert('Login Successful', `Welcome ${email}!`);
-            router.replace("/");
+        .then(async() => {
+            const docRef = doc(db, 'atlUsers', auth.currentUser?.uid || '');
+            const docData = await getDoc(docRef);
+            if (docData.exists()) {
+                if (docData.data().role === "student") {
+                    Alert.alert('Login Successful', `Welcome ${email}!`);
+                    router.replace("/student-snapshot/snapshot");
+                } else {
+                    Alert.alert("Error", "You are not a student!");
+                    await auth.signOut();
+                }
+            } else {
+                Alert.alert("Error", "User data not found! Please contact the administrator.");
+                await auth.signOut();
+            }
         })
         .catch(err => {
+            console.log(err);
             Alert.alert('Login Failed!', `Login with ${email} failed! Error: `+err.code);
         });
     };
