@@ -36,7 +36,7 @@ const DashboardPage = () => {
 
     const handleChatPress = (chatRef: DocumentReference) => {
         router.push({
-            pathname: '/chat/chat',
+            pathname: '/(pages)/chat/chat',
             params: { chatRef: chatRef.path }
         });
     };
