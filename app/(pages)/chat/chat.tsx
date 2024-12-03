@@ -7,12 +7,12 @@ import { doc, onSnapshot, getDoc, updateDoc, arrayUnion, arrayRemove, DocumentRe
 import db from '@/firebase/firestore';
 import auth from '@/firebase/auth';
 import MediaViewer from './components/MediaViewer';
-import type { Chat, User } from "@/firebase/firestore";
+import type { ChatData, User } from "@/firebase/firestore";
 
 const ChatPage = () => {
     const router = useRouter();
     const { chatRef } = useLocalSearchParams();
-    const [chatData, setChatData] = useState<Chat | null>(null);
+    const [chatData, setChatData] = useState<ChatData | null>(null);
     const [message, setMessage] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(true);
     const [senderNames, setSenderNames] = useState<Map<string, string>>(new Map());
@@ -27,7 +27,7 @@ const ChatPage = () => {
 
         const unsubscribe = onSnapshot(chatDoc, (docSnapshot) => {
             if (docSnapshot.exists()) {
-                const data = docSnapshot.data() as Chat;
+                const data = docSnapshot.data() as ChatData;
                 setChatData(data);
             }
             setLoading(false);
