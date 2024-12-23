@@ -163,7 +163,6 @@ type TinkeringActivityData = {
     }[];
     path?: string;
 }
-
 type SessionData = {
     timestamp: string;
     duration: number;
@@ -201,6 +200,26 @@ type ChatData = {
     path?: string;
 }
 
+
+type Task = {
+    ref: string;
+    taskDueDate: string;
+    taskName: string;
+    taskComments: string;
+    taskDescription: string;
+    taskDone: boolean;
+    status?: { status: string; modifiedAt: string }[];
+
+
+
+    users: DocumentReference[];
+    id?: string;
+    path?: string;
+
+  }
+
+
+
 const updateCompetition = async (competition: Competition) => {
     const { path, id, ...cleanedCompetition } = competition;
     const ref = doc(db, path || "");
@@ -225,8 +244,15 @@ const updateSession = async (session: Session) => {
     await updateDoc(ref, cleanedSession);
 }
 
+const updateTaskActivity = async (tasksData: Taskactivity) => {
+    const { path, id, ...cleanedTAData } = tasksData;
+    const ref = doc(db, path || "");
+    await updateDoc(ref, cleanedTAData);
+};
+
+
 export default db;
-export { updateCompetition, updateTinkeringActivity, updateCourse, updateSession };
+export { updateCompetition, updateTinkeringActivity, updateCourse, updateSession,updateTaskActivity };
 export type User = user;
 export type School = SchoolData;
 export type Student = StudentData;
@@ -235,3 +261,4 @@ export type Course = CourseData;
 export type TinkeringActivity = TinkeringActivityData;
 export type Session = SessionData;
 export type Chat = ChatData;
+export type Taskactivity = Task;
