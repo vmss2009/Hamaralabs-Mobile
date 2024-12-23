@@ -1,9 +1,11 @@
-import {getFirestore, collection, addDoc, updateDoc, DocumentReference, doc} from "firebase/firestore";
+import {getFirestore, collection, addDoc, updateDoc, DocumentReference, doc,getDocs,getDoc} from "firebase/firestore";
 import app from "./app";
 import TinkeringActivityCard from "@/app/(pages)/student-snapshot/components/TinkeringActivityCard";
 import updateProps from "react-native-reanimated/lib/typescript/reanimated2/UpdateProps";
 
 const db = getFirestore(app);
+const schoolPath: string = "schoolData";
+
 
 type user = {
     name: string;
@@ -164,6 +166,7 @@ type TinkeringActivityData = {
     path?: string;
 }
 
+
 type SessionData = {
     timestamp: string;
     duration: number;
@@ -201,6 +204,35 @@ type ChatData = {
     path?: string;
 }
 
+
+// Define Task type
+// Define Task type
+type Task = {
+    ref: string;
+    taskDueDate: string;
+    taskName: string;
+    taskComments: string;
+    taskDescription: string;
+    taskDone: boolean;
+    status?: { status: string; modifiedAt: string }[];
+
+
+
+    users: DocumentReference[];
+    id?: string;
+    path?: string;
+
+  }
+
+
+  
+  type ATLUser  = {
+    id: string; // Document ID
+    name: string; // Name of the user (e.g., "Jancy")
+    tasks: Task[]; // Array of tasks
+  }    
+
+
 const updateCompetition = async (competition: Competition) => {
     const { path, id, ...cleanedCompetition } = competition;
     const ref = doc(db, path || "");
@@ -209,6 +241,13 @@ const updateCompetition = async (competition: Competition) => {
 
 const updateTinkeringActivity = async (taData: TinkeringActivity) => {
     const { path, id, ...cleanedTAData } = taData;
+    const ref = doc(db, path || "");
+    await updateDoc(ref, cleanedTAData);
+};
+
+
+const updateTaskActivity = async (tasksData: Taskactivity) => {
+    const { path, id, ...cleanedTAData } = tasksData;
     const ref = doc(db, path || "");
     await updateDoc(ref, cleanedTAData);
 };
@@ -225,8 +264,38 @@ const updateSession = async (session: Session) => {
     await updateDoc(ref, cleanedSession);
 }
 
-export default db;
-export { updateCompetition, updateTinkeringActivity, updateCourse, updateSession };
+
+
+// Function to get a user document by ID and return the tasks array
+const getATLUserTasks = async (userId: string): Promise<ATLUser | null> => {
+    const userDocRef = doc(db, 'atlUsers', userId);
+    const userDoc = await getDoc(userDocRef);
+  
+    if (userDoc.exists()) {
+      const data = userDoc.data();
+      const tasks = (data.tasks || []).map((task: any) => ({
+        ref: task.ref,
+        taskDueDate: task.taskDueDate,
+        taskName: task.taskName,
+      }));
+  
+      return {
+        id: userId,
+        name: data.name,
+        tasks,
+      };
+    } else {
+      return null;
+    }
+  };
+
+    const addSchool = async (schoolData: SchoolData) => {
+    const ref = collection(db, schoolPath);
+    await addDoc(ref, schoolData);
+  };
+
+  export default db;
+export { updateCompetition, updateTinkeringActivity, updateCourse, updateSession,getATLUserTasks,updateTaskActivity,addSchool};
 export type User = user;
 export type School = SchoolData;
 export type Student = StudentData;
@@ -235,3 +304,5 @@ export type Course = CourseData;
 export type TinkeringActivity = TinkeringActivityData;
 export type Session = SessionData;
 export type Chat = ChatData;
+export type Taskactivity = Task;
+
