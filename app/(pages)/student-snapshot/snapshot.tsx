@@ -1,194 +1,177 @@
-import React, { useState } from 'react';
-import {
-  Modal,
-  Pressable,
-  ScrollView,
-  Text,
-  View,
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-} from 'react-native';
-import Picker from '@/components/Picker';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+import { collection, query, where, getDocs, doc, onSnapshot } from 'firebase/firestore';
 import tw from 'twrnc';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { TinkeringActivityData,  updateTinkeringActivity } from '@/firebase/firestore';
-import HyperText from '@/components/Textbox';
+import db from '@/firebase/firestore';
+import CompetitionReportBoxComponent from './components/CompetitionCard';
+import CourseReportBoxComponent from './components/CoursesCard';
+import TaskActivityReportBoxComponent from './components/Taskscard';
+import TinkeringReportBoxComponent from './components/TinkeringActivityCard';
 
-const TinkeringActivityReportBoxComponent = ({ activity }: { activity: TinkeringActivityData }) => {
-  const [modalVisible, setModalVisible] = useState(false);
-  const [statusModalVisible, setStatusModalVisible] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState(
-    activity.status ? activity.status[activity.status.length - 1].status : ''
-  );
+import SessionReportBoxComponent from './components/SessionCard';
+import type { Student, Competition, Course, Session, Taskactivity,TinkeringActivity } from '@/firebase/firestore';
+import auth from '@/firebase/auth';
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from "expo-router";
 
-  const toggleModal = () => setModalVisible(!modalVisible);
-  const toggleStatusModal = () => setStatusModalVisible(!statusModalVisible);
+const SnapshotPage = () => {
+    const router = useRouter();
+    const user = auth.currentUser;
+    const [student, setStudent] = useState<Student>();
+    const [selectedTab, setSelectedTab] = useState<string>('tasksData');
+    const [data, setData] = useState<TinkeringActivity[] | Competition[] | Course[] | Taskactivity[] | Session[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
 
-    const handleStatusChange = async (status: string) => {
-        setSelectedStatus(status);
-        const d = new Date();
-        const currentDate = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
-        activity.status?.push({
-            status: status,
-            modifiedAt: currentDate
-        });
-        await updateTinkeringActivity(activity);
-        toggleStatusModal();
-        Alert.alert("Status Updated", `The status has been changed to: ${status}`);
-    };
+    useEffect(() => {
+        const fetchStudent = async () => {
+            if (user?.email) {
+                console.log("User email:", user.email);
+
+                try {
+                    const studentCollection = collection(db, 'studentData');
+                    const studentQuery = query(studentCollection, where('email', '==', user.email));
+                    const querySnapshot = await getDocs(studentQuery);
+                    if (!querySnapshot.empty) {
+                        const studentDoc = querySnapshot.docs[0];
+                        setStudent({ ...studentDoc.data(), id: studentDoc.id } as Student);
+                        console.log("Fetched student data:", studentDoc);
+
+                    }
+                } catch (err) {
+                    console.error("Failed to fetch student data:", err);
+
+                    setError('Failed to fetch student data');
+                } finally {
+                    setLoading(false);
+                }
+            }
+        };
+
+        fetchStudent();
+    }, [user]);
+
+    useEffect(() => {
+        console.log("Selected Tab:", selectedTab);
+
+        setError(null);  // Reset error state on tab change
+        if (!student?.id) return;
+    
+        setLoading(true);
+    
+        // Adjusting Firestore path for the subcollection
+        const studentDocRef = doc(db, 'studentData', student.id);
+        const dataCollectionRef = collection(studentDocRef, selectedTab);
+    
+        const unsubscribe = onSnapshot(
+            dataCollectionRef,
+            (snapshot) => {
+                const dataList = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    path: doc.ref.path,
+                    ...doc.data(),
+                })) as Taskactivity[] | Competition[] | Course[] | TinkeringActivity[] | Session[];
+                // console.log(Fetched data for ${selectedTab}:, dataList);
+                // console.log('Fetched tasks:', dataList);
 
 
-  const statusOptions = [
-    'On Hold',
-    'Mentor Needed',
-    'Started Completing',
-    'Ongoing',
-    'Nearly Completed',
-    'In Review',
-    'Review Completed',
-    'TA Completed',
-  ];
-  // Determine background color based on status
-    const isCompleted = selectedStatus === 'TA Completed';
-    const backgroundColor = isCompleted ? 'rgb(204,255,204)' : 'rgb(224,242,255)'; // Green if completed, light blue otherwise
+                setData(dataList);
+                setLoading(false);
+            },
+            (err) => {
+                setError('Failed to fetch data');
+                setLoading(false);
+            }
+        );
+    
+        return () => unsubscribe();
+    }, [selectedTab, student]);
+    
 
-  return (
-    <View>
-      <Pressable
-      style={[
-          tw`p-4 mb-4 rounded-lg shadow-lg border-l-4 bg-blue-100 p-4 mb-4 rounded-lg shadow-lg border-l-4 border-blue-500`,
-          { backgroundColor, borderColor: isCompleted ? 'rgb(102,204,102)' : 'rgb(59,130,246)' },
-        ]}
+    const tabs = [
+        { label: 'Tinkering Activities', value: 'taData' },
+        { label: 'Tasks', value: 'tasksData' },
+        { label: 'Competitions', value: 'competitionData' },
+        { label: 'Courses', value: 'coursesData' },
+        { label: 'Sessions', value: 'sessionData' },
+    ];
+    const renderData = () => {
+        if (loading) return <ActivityIndicator size="large" color="#0000ff" />;
+        if (error) return <Text style={tw`text-center text-gray-600`}>{error}</Text>;
+        if (data.length === 0) return <Text style={tw`text-center text-gray-600`}>No data available</Text>;
+
+    return (
+        <ScrollView>
+                    {selectedTab === 'taData' && data.map((item, index) => (
+                        <TinkeringReportBoxComponent key={index} activity={item as TinkeringActivity} />
+                    ))}
+
+
+                     {selectedTab === 'tasksData' && data.map((item, index) => (
+                        <TaskActivityReportBoxComponent key={index} activity={item as Taskactivity} />
+                    ))}
+
+                    {selectedTab === 'competitionData' && data.map((item, index) => (
+                        <CompetitionReportBoxComponent key={index} competition={item as Competition} />
+                    ))}
+                    {selectedTab === 'coursesData' && data.map((item, index) => (
+                        <CourseReportBoxComponent key={index} course={item as Course} />
+                    ))}
+                    {selectedTab === 'sessionData' && data.map((item, index) => (
+                        <SessionReportBoxComponent key={index} session={item as Session} />
+                    ))}
+                                </ScrollView>
+
+                    );
+                    };
 
 
 
-      
-        // style={tw`bg-blue-100 p-4 mb-4 rounded-lg shadow-lg border-l-4 border-blue-500`}
-        onPress={toggleModal}
-      >
-        <Text style={tw`text-lg font-bold text-blue-900`}>{activity.taName}</Text>
-        {/* <HyperText style={tw`text-sm text-gray-700`} content={activity.intro} /> */}
-        {/* <Text style={tw`text-sm text-gray-700`}>Subject: {activity.subject}</Text> */}
-        {/* <Text style={tw`text-sm text-gray-700`}>
-          Status:{' '}
-          {activity.status
-            ? ${activity.status[activity.status.length - 1].status} - ${activity.status[activity.status.length - 1].modifiedAt}
-            : ''}
-        </Text> */}
-        <Text style={tw`text-sm text-gray-700`}>Status: {activity.status !== undefined ? activity.status[activity.status.length - 1].status + " - " + activity.status[activity.status.length - 1].modifiedAt : ""}</Text>
-      </Pressable>
 
-      <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={toggleModal}>
-      <KeyboardAvoidingView
-    style={tw`flex-1`}
-    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
-  >
-          <View style={tw`flex-1 bg-black bg-opacity-50 justify-center items-center`}>
+                    return (
+                        <View style={tw`flex-1 bg-gray-100 p-4`}>
+                            {/* Header with Back Button and Centered Text */}
+                            <View style={tw`flex-row items-center justify-center mt-2`}>
+                                <TouchableOpacity onPress={() => {router.canGoBack() ? router.back() : router.replace("/")}} style={tw`absolute left-4`}>
+                                    <Ionicons name="arrow-back" size={24} color="black" />
+                                </TouchableOpacity>
+                                <Text style={tw`text-lg font-bold text-gray-800`}>Snapshot</Text>
+                                <TouchableOpacity onPress={() => router.replace("/")} style={tw`absolute right-4`}>
+                                    <Ionicons name="home" size={24} color="black" />
+                                </TouchableOpacity>
+                            </View>
+                                {/* tab session */}
 
-          <View style={tw`bg-white p-6 rounded-lg w-11/12 relative`}>
-          <Pressable
-              style={tw`absolute top-3 right-3 p-2 bg-gray-600 rounded-full shadow z-50`}
-              onPress={toggleModal}
-            >
-              <Icon name="close" size={12} color="#FFFFFF" />
-            </Pressable>
-            <ScrollView
-          contentContainerStyle={tw`p-4`}
-          nestedScrollEnabled
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={true}
-          scrollEventThrottle={16}
+                                <View style={tw`flex-row border-b-2 border-gray-300 mt-4`}>
+                                <ScrollView horizontal showsHorizontalScrollIndicator={true}>
+                                {tabs.map((tab) => (
+        <TouchableOpacity
+            key={tab.value}
+            onPress={() => setSelectedTab(tab.value)}
+            style={[
+                tw`py-1 px-2`, // Adjusted padding for more space on smaller screens
+                selectedTab === tab.value ? tw`border-b-4 border-blue-500` : null
+            ]}
         >
-              <Text style={tw`text-2xl font-bold text-blue-900 mb-2`}>{activity.taName}</Text>
-  <Text style={tw`text-lg my-4 text-gray-700`}>
-        <Text style={tw`font-bold text-black-600`}>Introduction: </Text>
-        {activity.intro}
-      </Text>              {/* <Text style={tw`text-lg my-4 text-gray-700`}>Subject: {activity.subject}</Text>
-              <Text style={tw`text-lg my-4 text-gray-700`}>Topic: {activity.topic}</Text>
-              <Text style={tw`text-lg my-4 text-gray-700`}>Sub-Topic: {activity.subTopic}</Text> */}
-              {/* <HyperText
-                style={tw`text-lg my-4 text-gray-700`}
-                content={`Goals: ${activity.goals && activity.goals.join(', ')}`}
-              /> */}
-               <Text style={tw`text-lg my-4 text-gray-700`}>
-        <Text style={tw`font-bold text-black-600`}>Goals: </Text>
-        {activity.goals && activity.goals.join(', ')}
-      </Text>
-              {/* <HyperText
-                style={tw`text-lg my-4 text-gray-700`}
-                content={`Materials: ${activity.materials && activity.materials.join(', ')}`}
-              /> */}
-              <Text style={tw`text-lg my-4 text-gray-700`}>
-        <Text style={tw`font-bold text-black-600`}>Materials: </Text>
-        {activity.materials && activity.materials.join(', ')}
-      </Text>
-              {/* <HyperText
-                style={tw`text-lg my-4 text-gray-700`}
-                content={`Instructions: ${activity.instructions && activity.instructions.join(', ')}`}
-              /> */}
-               <Text style={tw`text-lg my-4 text-gray-700`}>
-        <Text style={tw`font-bold text-black-600`}>Instructions: </Text>
-        {activity.instructions && activity.instructions.join(', ')}
-      </Text>
+                    <Text
+                        style={[
+                            tw`text-center text-xs font-medium`,
+                            selectedTab === tab.value ? tw`text-blue-500` : tw`text-gray-600`
+                        ]}
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                    >
+                        {tab.label}
+                    </Text>
+                </TouchableOpacity>
+            ))}
+                                            </ScrollView>
 
-                <Text style={tw`text-lg my-4 text-gray-700`}>
-        <Text style={tw`font-bold text-black-600`}>Tips: </Text>
-        {activity.tips && activity.tips.join(', ')}
-      </Text>
-              {/* <HyperText
-                style={tw`text-lg my-4 text-gray-700`}
-                content={`Tips: ${activity.tips && activity.tips.join(', ')}`}
-              /> */}
-              <Text style={tw`text-lg my-4  font-bold text-black-700`}>Status:</Text>
-              {activity.status &&
-                activity.status.map((statusItem, index) => (
-                  <Text key={index} style={tw`text-lg text-gray-700`}>
-                    {statusItem.status} - {statusItem.modifiedAt}
-                  </Text>
-                ))}
-            </ScrollView>
-          </View>
-          </View>
+        </View>
+                            {/* Data Section */}
+                            {renderData()}
+                        </View>                    );
+                };
+                
+                export default SnapshotPage;
 
-        </KeyboardAvoidingView>
-      </Modal>
-
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={statusModalVisible}
-        onRequestClose={toggleStatusModal}
-      >
-        <KeyboardAvoidingView
-          style={tw`flex-1 justify-center items-center  font-bold bg-black bg-opacity-50`}
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        >
-                    <View style={tw`bg-white p-6 rounded-lg w-11/12 relative font-bold `}>
-
-          {/* <Pressable
-            style={tw`bg-white p-6 rounded-lg w-11/12 relative`}
-            onPress={() => {}}
-          > */}
-            <Pressable
-              style={tw`absolute top-3 right-3 p-2 bg-gray-600 rounded-full  font-bold shadow z-50`}
-              onPress={toggleStatusModal}
-            >
-              <Icon name="close" size={12} color="#FFFFFF" />
-            </Pressable>
-            <Text style={tw`text-2xl font-bold text-blue-900 mb-4`}>Select Status</Text>
-            <Picker
-              selectedValue={selectedStatus}
-              onValueChange={(itemValue) => handleStatusChange(itemValue)}
-              data={statusOptions.map((status) => ({ label: status, value: status }))}
-              style={tw`w-full `}
-            />
-          </View>
-        </KeyboardAvoidingView>
-      </Modal>
-    </View>
-  );
-};
-
-export default TinkeringActivityReportBoxComponent;
