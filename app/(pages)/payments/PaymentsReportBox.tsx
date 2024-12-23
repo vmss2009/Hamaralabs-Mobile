@@ -20,8 +20,8 @@ import Receipt from './Receipt';
 import {getFirestore, collection,query, where, updateDoc,onSnapshot, DocumentReference, doc,getDocs,getDoc} from "firebase/firestore";
 
 import db from '@/firebase/firestore';
-import { jsPDF } from 'jspdf';
-import html2canvas from 'html2canvas';
+// import { jsPDF } from 'jspdf';
+// import html2canvas from 'html2canvas';
 
 import { Alert } from 'react-native';
 
@@ -37,10 +37,10 @@ import PDFLib from 'react-native-pdf-lib'; // Use default import
 
 import {  Platform } from 'react-native';
 import * as FileSystem from 'expo-file-system';
-import * as Permissions from 'expo-permissions'; // Use if needed for permissions
+// import * as Permissions from 'expo-permissions'; // Use if needed for permissions
 
-import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
-import * as Sharing from 'expo-sharing';
+// import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
+// import * as Sharing from 'expo-sharing';
 
 
 
@@ -160,6 +160,7 @@ const PaymentReportBox: React.FC<PaymentReportBoxProps> = (props) => {
     discountType: "price",
     discount: 0,
   });
+
   const [paymentSuccessful, setPaymentSuccessful] = useState(false); // New state
   const navigation = useNavigation(); // Access navigation
   // const [receiptData, setReceiptData] = useState<ReceiptData | null>(null);
@@ -279,7 +280,7 @@ useEffect(() => {
 
     try {
       // Call the downloadPDF function and pass the receiptData after checking it's not null
-      await downloadPDF(receiptData);
+      // await downloadPDF(receiptData);
       setLoading(false);  // Hide loading spinner once done
       console.log("Download completed.");
     } catch (error) {
@@ -289,7 +290,13 @@ useEffect(() => {
     }
   };
 
-
+  // useEffect(() => {
+  //   if (amountPaid !== null && props.data?.paymentInfo?.status !== 'COMPLETED') {
+  //     // Update the status if the payment is done
+  //     props.updatePaymentStatus('COMPLETED');
+  //   }
+  // }, [amountPaid, props.data?.paymentInfo?.status]);
+  
 
 
 useEffect(() => {
@@ -510,161 +517,164 @@ useEffect(() => {
       }
     };
           // Request storage permission for Android
-          const requestStoragePermission = async (): Promise<boolean> => {
-            if (Platform.OS === 'android') {
-              const { status } = await Permissions.askAsync(Permissions.MEDIA_LIBRARY);
-              return status === 'granted';
-            }
-            return true; // Assume permission for non-Android platforms
-          };
+//           const requestStoragePermission = async (): Promise<boolean> => {
+//             if (Platform.OS === 'android') {
+//               const { status } = await Permissions.askAsync(Permissions.MEDIA_LIBRARY);
+//               return status === 'granted';
+//             }
+//             return true; // Assume permission for non-Android platforms
+//           };
           
-          const downloadPDF = async (data: ReceiptData) => {
-            console.log('Starting PDF download...');
+//           const downloadPDF = async (data: ReceiptData) => {
+//             console.log('Starting PDF download...');
           
-            try {
-              console.log('Generating PDF with the following data:', data);
+//             try {
+//               console.log('Generating PDF with the following data:', data);
           
-              const { date, transactionId, merchantTransactionId, amount, paidBy, items } = data;
+//               const { date, transactionId, merchantTransactionId, amount, paidBy, items } = data;
 
-                  // Load the custom font from the file system
-    const fontPath = `${FileSystem.documentDirectory}Roboto-Regular.ttf`;
+//                   // Load the custom font from the file system
+//     const fontPath = `${FileSystem.documentDirectory}Roboto-Regular.ttf`;
 
-    // Ensure font file is available
-    const fontBase64 = await FileSystem.readAsStringAsync(fontPath, {
-      encoding: FileSystem.EncodingType.Base64,
-    });
+//     // Ensure font file is available
+//     const fontBase64 = await FileSystem.readAsStringAsync(fontPath, {
+//       encoding: FileSystem.EncodingType.Base64,
+//     });
+// // Decode the Base64 font data to Uint8Array
+// const fontBytes = Uint8Array.from(atob(fontBase64), (char) => char.charCodeAt(0));
 
           
-              // Create a new PDF document
-              const pdfDocument = await PDFDocument.create();
-              const page = pdfDocument.addPage([600, 800]);
-              // Embed the custom font
-    const fontBytes = Buffer.from(fontBase64, 'base64');
-    const customFont = await pdfDocument.embedFont(fontBytes);
+//               // Create a new PDF document
+//               const pdfDocument = await PDFDocument.create();
+//               const page = pdfDocument.addPage([600, 800]);
+//               // Embed the custom font
+//     // const fontBytes = Buffer.from(fontBase64, 'base64');
+//     const customFont = await pdfDocument.embedFont(fontBytes);
 
-              // Add text to the page
-    // Add receipt details
-    page.drawText('Receipt', { x: 20, y: 750, size: 16, font: customFont, color: rgb(0, 0, 0) });
-    page.drawText(`Date: ${date}`, { x: 20, y: 730, size: 12, font: customFont });
-    page.drawText(`Transaction ID: ${transactionId || 'N/A'}`, { x: 20, y: 710, size: 12, font: customFont });
-    page.drawText(`Merchant Transaction ID: ${merchantTransactionId || 'N/A'}`, { x: 20, y: 690, size: 12, font: customFont });
-    page.drawText(`TA ID: ${props.data.taID || 'N/A'}`, { x: 20, y: 670, size: 12, font: customFont });
-    page.drawText(`Amount: ₹${amount}`, { x: 20, y: 650, size: 12, font: customFont });
-    page.drawText(`Paid By: ${paidBy}`, { x: 20, y: 630, size: 12, font: customFont });
+//               // Add text to the page
+//     // Add receipt details
+//     page.drawText('Receipt', { x: 20, y: 750, size: 16, font: customFont, color: rgb(0, 0, 0) });
+//     page.drawText(`Date: ${date}`, { x: 20, y: 730, size: 12, font: customFont });
+//     page.drawText(`Transaction ID: ${transactionId || 'N/A'}`, { x: 20, y: 710, size: 12, font: customFont });
+//     page.drawText(`Merchant Transaction ID: ${merchantTransactionId || 'N/A'}`, { x: 20, y: 690, size: 12, font: customFont });
+//     page.drawText(`TA ID: ${props.data.taID || 'N/A'}`, { x: 20, y: 670, size: 12, font: customFont });
+//     page.drawText(`Amount: ₹${amount}`, { x: 20, y: 650, size: 12, font: customFont });
+//     page.drawText(`Paid By: ${paidBy}`, { x: 20, y: 630, size: 12, font: customFont });
 
-    let yPosition = 630;
-    page.drawText('Items:', { x: 20, y: yPosition, size: 12, font: customFont });
-    yPosition -= 20;
+//     let yPosition = 630;
+//     page.drawText('Items:', { x: 20, y: yPosition, size: 12, font: customFont });
+//     yPosition -= 20;
 
-    items.forEach((item) => {
-      const itemDetails = `${item.description} - Qty: ${item.quantity}, Price: ₹${item.price}, Total: ₹${item.total}`;
-      page.drawText(itemDetails, { x: 20, y: yPosition, size: 10, font: customFont });
-      yPosition -= 20;
-    });
+//     items.forEach((item) => {
+//       const itemDetails = `${item.description} - Qty: ${item.quantity}, Price: ₹${item.price}, Total: ₹${item.total}`;
+//       page.drawText(itemDetails, { x: 20, y: yPosition, size: 10, font: customFont });
+//       yPosition -= 20;
+//     });
 
-    // Save the PDF
-    const pdfBytes = await pdfDocument.save();
-    const pdfBase64 = Buffer.from(pdfBytes).toString('base64');
-    const filePath = `${FileSystem.documentDirectory}Receipt.pdf`;
+//     // Save the PDF
+//     const pdfBytes = await pdfDocument.save();
+//     const pdfBase64 = Buffer.from(pdfBytes).toString('base64');
+//     const filePath = `${FileSystem.documentDirectory}Receipt.pdf`;
 
-    await FileSystem.writeAsStringAsync(filePath, pdfBase64, {
-      encoding: FileSystem.EncodingType.Base64,
-    });
+//     await FileSystem.writeAsStringAsync(filePath, pdfBase64, {
+//       encoding: FileSystem.EncodingType.Base64,
+//     });
 
-    Alert.alert('PDF Downloaded', `Receipt saved at: ${filePath}`);
+//     Alert.alert('PDF Downloaded', `Receipt saved at: ${filePath}`);
 
-              // Step 3: Update Firestore Payment Details
+//               // Step 3: Update Firestore Payment Details
 
 
-              if (!props.data.taID) {
-  console.warn('TA ID is missing');
-  Alert.alert('Error', 'TA ID is missing');
-  return;
-}
+//               if (!props.data.taID) {
+//   console.warn('TA ID is missing');
+//   Alert.alert('Error', 'TA ID is missing');
+//   return;
+// }
 
-              const studentQuerySnapshot = await getDocs(collection(db, "studentData"));
-              const discountedValue = tinkeringActivityAmount;
-              console.log('Student Data Retrieved:', studentQuerySnapshot.docs.length);
+//               const studentQuerySnapshot = await getDocs(collection(db, "studentData"));
+//               const discountedValue = tinkeringActivityAmount;
+//               console.log('Student Data Retrieved:', studentQuerySnapshot.docs.length);
 
-              let matchedStudentId: string | null = null;
-              let matchedDocId: string | null = null;
+//               let matchedStudentId: string | null = null;
+//               let matchedDocId: string | null = null;
       
-              // Loop through student documents to find a matching taID in "taData"
-              for (const studentDoc of studentQuerySnapshot.docs) {
-                const studentId = studentDoc.id;
+//               // Loop through student documents to find a matching taID in "taData"
+//               for (const studentDoc of studentQuerySnapshot.docs) {
+//                 const studentId = studentDoc.id;
       
-                console.log("Checking taData subcollection for student:", studentId);
+//                 console.log("Checking taData subcollection for student:", studentId);
       
-                const taDataQuery = query(
-                  collection(db, "studentData", studentId, "taData"),
-                  where("taID", "==", props.data.taID)
-                );
+//                 const taDataQuery = query(
+//                   collection(db, "studentData", studentId, "taData"),
+//                   where("taID", "==", props.data.taID)
+//                 );
       
-                const taDataSnapshot = await getDocs(taDataQuery);
-                console.log("Found TA Data:", taDataSnapshot.empty);
+//                 const taDataSnapshot = await getDocs(taDataQuery);
+//                 console.log("Found TA Data:", taDataSnapshot.empty);
 
-                if (!taDataSnapshot.empty) {
-                  const taDoc = taDataSnapshot.docs[0]; // Assuming one matching document per student
-                  matchedStudentId = studentId;
-                  matchedDocId = taDoc.id;
-                  break;
-                }
-              }
-              if (!matchedStudentId || !matchedDocId) {
-                console.warn('No matching TA data found');
-                Alert.alert('Error', 'No matching TA data found');
-                return;
-              }
+//                 if (!taDataSnapshot.empty) {
+//                   const taDoc = taDataSnapshot.docs[0]; // Assuming one matching document per student
+//                   matchedStudentId = studentId;
+//                   matchedDocId = taDoc.id;
+//                   break;
+//                 }
+//               }
+//               if (!matchedStudentId || !matchedDocId) {
+//                 console.warn('No matching TA data found');
+//                 Alert.alert('Error', 'No matching TA data found');
+//                 return;
+//               }
               
               
-    if (transactionId) {
-      const paymentDocRef = doc(
-        db,
-        "studentData",
-        matchedStudentId as string,
-        "taData",
-        matchedDocId as string
-      );
+//     if (transactionId) {
+//       const paymentDocRef = doc(
+//         db,
+//         "studentData",
+//         matchedStudentId as string,
+//         "taData",
+//         matchedDocId as string
+//       );
       
-            // const paymentDocSnap = 
+//             // const paymentDocSnap = 
 
-      await updateDoc( paymentDocRef,{
-        paymentDate: new Date().toISOString(),
-        taID: props.data.taID,
-        paidBy: paidBy,
-        transactionId: transactionId,
-        merchantTransactionId: props.data.merchantTransactionId,
-        paymentStatus: "Successful",
-        amountPaid: discountedValue,
+//       await updateDoc( paymentDocRef,{
+//         paymentDate: new Date().toISOString(),
+//         taID: props.data.taID,
+//         paidBy: paidBy,
+//         transactionId: transactionId,
+//         merchantTransactionId: props.data.merchantTransactionId,
+//         paymentStatus: "Successful",
+//         amountPaid: discountedValue,
 
 
-      });
+//       });
 
-      console.log('Firestore payment details updated successfully');
-      Alert.alert('Firestore Updated', 'Payment details updated successfully.');
-    } else {
-      console.warn('Transaction ID is missing. Cannot update Firestore.');
-      Alert.alert('Warning', 'Transaction ID is missing. Update failed.');
-    }
+//       console.log('Firestore payment details updated successfully');
+//       Alert.alert('Firestore Updated', 'Payment details updated successfully.');
+//     } else {
+//       console.warn('Transaction ID is missing. Cannot update Firestore.');
+//       Alert.alert('Warning', 'Transaction ID is missing. Update failed.');
+//     }
 
-              // Optional: Share the PDF
-              if (await Sharing.isAvailableAsync()) {
-                await Sharing.shareAsync(filePath);
-              } else {
-                console.log('Sharing not available on this device.');
-              }
-            } catch (error) {
-              console.error('Error generating PDF:', error);
-              Alert.alert('Error', 'Failed to generate receipt PDF.');
-            }
-          };
+//               // Optional: Share the PDF
+//               if (await Sharing.isAvailableAsync()) {
+//                 await Sharing.shareAsync(filePath);
+//               } else {
+//                 console.log('Sharing not available on this device.');
+//               }
+//             } catch (error) {
+//               console.error('Error generating PDF:', error);
+//               Alert.alert('Error', 'Failed to generate receipt PDF.');
+//             }
+//           };
               return (
     <View style={styles.paymentReportBox}>
       <Text style={styles.heading}>{props.data.taName}</Text>
       <Text>
         <Text style={styles.label}>TA ID:</Text> {props.data.taID}
       </Text>
-      <Text style={styles.label}>TA Status:</Text>
+      {/* pending tryed code */}
+      {/* <Text style={styles.label}>TA Status:</Text>
       <Text
   style={
     props.data?.paymentInfo?.status?.toUpperCase() === 'COMPLETED'
@@ -675,11 +685,50 @@ useEffect(() => {
   {props.data?.paymentInfo?.status 
     ? props.data.paymentInfo.status.charAt(0).toUpperCase() + props.data.paymentInfo.status.slice(1).toLowerCase() 
     : 'Status unavailable'}
-</Text>
-      <Text>
+</Text> */}
+
+<Text style={styles.label}>TA Status:</Text>
+    <Text
+      style={
+        typeof amountPaid === 'number'
+          ? styles.completed
+          : props.data?.paymentInfo?.status?.toUpperCase() === 'COMPLETED'
+          ? styles.completed
+          : styles.pending
+      }
+    >
+      {typeof amountPaid === 'number'
+        ? 'Completed'
+        : props.data?.paymentInfo?.status
+        ? props.data.paymentInfo.status.charAt(0).toUpperCase() +
+          props.data.paymentInfo.status.slice(1).toLowerCase()
+        : 'Pending'}
+    </Text>
+    {amountPaid !== null && (
+      <Text style={styles.label}>
+        Amount Paid: <Text style={styles.value}>₹{amountPaid}</Text>
+      </Text>
+    )}
+    <Text>
+      <Text style={styles.label}>Original Price:</Text>{' '}
+      {props.data?.paymentInfo?.amount ?? 'Price unavailable'}
+    </Text>
+    {/* <Text>
+      <Text style={styles.label}>Original Price:</Text>{' '}
+      {props.data?.paymentInfo?.amount ?? 'Price unavailable'}
+    </Text> */}
+    {/* <Text>
+      <Text style={styles.label}>Original Price:</Text>{' '}
+      {props.data?.paymentInfo?.amount ?? 'Price unavailable'}
+    </Text> */}
+
+
+
+
+      {/* <Text>
         <Text style={styles.label}>Original Price:</Text>{" "}
         {props.data.paymentInfo.amount}
-      </Text>
+      </Text> */}
       {/* <Button
   title="Download Receipt"
   onPress={() => {
@@ -708,19 +757,19 @@ useEffect(() => {
  */}
     {/* <View style={styles.receiptContainer}> */}
       {/* Button for download */}
-      <Button title="Download Receipt" onPress={handleDownload} />
+      {/* <Button title="Download Receipt" onPress={handleDownload} /> */}
 
       {/* Receipt component - conditionally rendered */}
-      {showReceipt && receiptData && <Receipt receiptData={receiptData} />}
+      {/* {showReceipt && receiptData && <Receipt receiptData={receiptData} />} */}
     {/* </View> */}
 
 
 
-{amountPaid !== null && (
+{/* {amountPaid !== null && (
         <Text style={styles.label}>
           Amount Paid: <Text style={styles.value}>₹{amountPaid}</Text>
         </Text>
-      )}
+      )} */}
 
 
 
