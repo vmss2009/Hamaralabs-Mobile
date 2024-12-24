@@ -18,7 +18,7 @@ const SnapshotPage = () => {
     const router = useRouter();
     const user = auth.currentUser;
     const [student, setStudent] = useState<Student>();
-    const [selectedTab, setSelectedTab] = useState<string>('tasksData');
+    const [selectedTab, setSelectedTab] = useState<string>('taData');
     const [data, setData] = useState<TinkeringActivity[] | Competition[] | Course[] | Taskactivity[] | Session[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -149,7 +149,7 @@ const SnapshotPage = () => {
             key={tab.value}
             onPress={() => setSelectedTab(tab.value)}
             style={[
-                tw`py-1 px-2`, // Adjusted padding for more space on smaller screens
+                tw`py-1 px-1`, // Adjusted padding for more space on smaller screens
                 selectedTab === tab.value ? tw`border-b-4 border-blue-500` : null
             ]}
         >
