@@ -55,6 +55,9 @@ const TinkeringActivityReportBoxComponent = ({ activity }: { activity: Tinkering
 
   return (
     <View>
+      <View style={tw`mb-2`}>
+</View>
+
       <Pressable
         // style={tw`bg-blue-100 p-4 mb-4 rounded-lg shadow-lg border-l-4 border-blue-500`}
         style={[
@@ -64,15 +67,18 @@ const TinkeringActivityReportBoxComponent = ({ activity }: { activity: Tinkering
 
         onPress={toggleModal}
       >
-        <Text style={tw`text-lg font-bold text-blue-900`}>{activity.taName}</Text>
-        <HyperText style={tw`text-sm text-gray-700`} content={activity.intro} />
-        <Text style={tw`text-sm text-gray-700`}>Subject: {activity.subject}</Text>
-        {/* <Text style={tw`text-sm text-gray-700`}>
+        {/* <Text style={tw`text-s font-bold text-blue-900`}>{activity.taName}</Text> */}
+        <Text style={tw`text-lg font-bold text-blue-900 leading-none`}>
+  {(activity.taName || '').trim().replace(/\s+/g, ' ')}
+</Text>
+        {/* <HyperText style={tw`text-sm text-gray-700`} content={activity.intro} />
+        <Text style={tw`text-sm text-gray-700`}>Subject: {activity.subject}</Text> */}
+         <Text style={tw`text-sm text-gray-700`}>
           Status:{' '}
           {activity.status
             ? `${activity.status[activity.status.length - 1].status} - ${activity.status[activity.status.length - 1].modifiedAt}`
             : ''}
-        </Text> */}
+        </Text> 
       </Pressable>
 
       <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={toggleModal}>
