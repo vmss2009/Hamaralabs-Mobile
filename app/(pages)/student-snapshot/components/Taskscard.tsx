@@ -76,7 +76,11 @@ const TaskActivityReportBoxComponent = ({ activity }: { activity: Taskactivity |
     }
 
     return (
+        
         <View>
+      <View style={tw`mb-2`}>
+</View>
+
             {tasks.map((task, index) => (
                 <TouchableOpacity
                     key={index}
