@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView,StyleSheet, ActivityIndicator,SafeAreaView,StatusBar } from 'react-native';
 import { collection, query, where, getDocs, doc, onSnapshot } from 'firebase/firestore';
 import tw from 'twrnc';
 import db from '@/firebase/firestore';
@@ -129,9 +129,19 @@ const SnapshotPage = () => {
 
 
                     return (
-                        <View style={tw`flex-1 bg-gray-100 p-4`}>
+                        // <SafeAreaView style={tw`flex-1 bg-gray-100`}>
+                        <SafeAreaView style={styles.safeArea}>
+
+                        <StatusBar
+                            translucent={true}
+                            backgroundColor="transparent"
+                            barStyle="dark-content"
+                            hidden={false}
+                        />
+            
+                        <View style={tw`flex-1 bg-gray-100 p-0`}>
                             {/* Header with Back Button and Centered Text */}
-                            <View style={tw`flex-row items-center justify-center mt-2`}>
+                            <View style={tw`flex-row items-center justify-center mt-0`}>
                                 <TouchableOpacity onPress={() => {router.canGoBack() ? router.back() : router.replace("/")}} style={tw`absolute left-4`}>
                                     <Ionicons name="arrow-back" size={24} color="black" />
                                 </TouchableOpacity>
@@ -149,7 +159,7 @@ const SnapshotPage = () => {
             key={tab.value}
             onPress={() => setSelectedTab(tab.value)}
             style={[
-                tw`py-1 px-1`, // Adjusted padding for more space on smaller screens
+                tw`py-1 px-2`, // Adjusted padding for more space on smaller screens
                 selectedTab === tab.value ? tw`border-b-4 border-blue-500` : null
             ]}
         >
@@ -170,8 +180,31 @@ const SnapshotPage = () => {
         </View>
                             {/* Data Section */}
                             {renderData()}
-                        </View>                    );
+                        </View>  
+                        </SafeAreaView>
+                  );
                 };
+
+                const styles = StyleSheet.create({
+                    safeArea: {
+                        flex: 1,
+                        backgroundColor: '#f0f0f0', // Matches StatusBar background color
+                    },
+                    container: {
+                        flex: 1,
+                        paddingHorizontal: 20,
+                        paddingTop: 10, // Adjust this to reduce the gap
+                    },
+                    header: {
+                        fontSize: 20,
+                        fontWeight: 'bold',
+                        textAlign: 'center',
+                        marginBottom: 10, // Adjust to tweak spacing from the content
+                    },
+                });
+                
+                
+
                 
                 export default SnapshotPage;
 
