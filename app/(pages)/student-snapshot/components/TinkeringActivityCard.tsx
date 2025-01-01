@@ -102,35 +102,100 @@ const TinkeringActivityReportBoxComponent = ({ activity }: { activity: Tinkering
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={true}
           scrollEventThrottle={16}
-        >
-              <Text style={tw`text-3xl font-bold text-blue-900 mb-2`}>{activity.taName}</Text>
-              <HyperText style={tw`text-lg my-4 text-gray-700`} content={`Introduction: ${activity.intro}`} />
+        >  
+                        {/* <Text style={tw`text-3xl font-bold textDecorationLine: 'underline' text-blue-900 mb-4`}>Tinkering Activity</Text> */}
+                        <View>
+      <Text style={{ fontSize: 12, color: 'darkblue', fontWeight: 'bold' }}>
+        Tinkering Activity
+      </Text>
+    </View>
+    {/* <View>
+      <Text style={{ fontSize: 32, color: 'darkblue', textDecorationLine: 'underline', fontWeight: 'bold' }}>
+        TINKERING ACTIVITY
+      </Text>
+    </View> */}
+            
+        {/* <Text style={tw`text-3xl font-bold text-blue-900 mb-2`}>{activity.taName}</Text> */}
+        <Text style={tw`text-lg font-bold text-blue-700 mb-2`}>{activity.taName}</Text>
+
+              {/* <Text style={tw`text-xl font-bold text-blue-700 mb-2`}>{activity.taName}</Text> */}
+              <Text style={tw`text-lg mb-4 text-gray-700`}>
+              <Text style={tw`font-bold`}>Introduction:</Text> {activity.intro}
+
+                </Text> 
               {/* <Text style={tw`text-lg my-4 text-gray-700`}>Subject: {activity.subject}</Text>
               <Text style={tw`text-lg my-4 text-gray-700`}>Topic: {activity.topic}</Text>
               <Text style={tw`text-lg my-4 text-gray-700`}>Sub-Topic: {activity.subTopic}</Text> */}
-              <HyperText
-                style={tw`text-lg my-4 text-gray-700`}
-                content={`Goals: ${activity.goals && activity.goals.join(', ')}`}
-              />
-              <HyperText
-                style={tw`text-lg my-4 text-gray-700`}
-                content={`Materials: ${activity.materials && activity.materials.join(', ')}`}
-              />
-              <HyperText
-                style={tw`text-lg my-4 text-gray-700`}
-                content={`Instructions: ${activity.instructions && activity.instructions.join(', ')}`}
-              />
-              <HyperText
-                style={tw`text-lg my-4 text-gray-700`}
-                content={`Tips: ${activity.tips && activity.tips.join(', ')}`}
-              />
-              <Text style={tw`text-lg my-4 text-gray-700`}>Status:</Text>
-              {activity.status &&
-                activity.status.map((statusItem, index) => (
-                  <Text key={index} style={tw`text-lg text-gray-700`}>
-                    {statusItem.status} - {statusItem.modifiedAt}
-                  </Text>
-                ))}
+
+              
+{/* <Text style={tw`text-lg mb-4 text-gray-700`}>
+  <Text style={tw`font-bold`}>Goals:</Text> {activity.goals && activity.goals.join(', ')}
+</Text> */}
+
+
+<Text style={{ fontWeight: 'bold', fontSize: 18, marginBottom: 8 }}>Goals:</Text>
+      {activity.goals &&
+        activity.goals.map((goals, index) => (
+          <Text key={index} style={{ fontSize: 16, marginBottom: 4 }}>
+            {index + 1}. {goals}
+          </Text>
+        ))}
+
+
+
+{/* <Text style={tw`text-lg mb-4 text-gray-700`}>
+  <Text style={tw`font-bold`}>Materials:</Text> {activity.materials && activity.materials.join(', ')}
+</Text> */}
+
+
+<Text style={{ fontWeight: 'bold', fontSize: 18, marginBottom: 8 }}>Materials:</Text>
+      {activity.materials &&
+        activity.materials.map((materials, index) => (
+          <Text key={index} style={{ fontSize: 16, marginBottom: 4 }}>
+            {index + 1}. {materials}
+          </Text>
+        ))}
+
+
+{/* <Text style={tw`text-lg mb-4 text-gray-700`}>
+  <Text style={tw`font-bold`}>Instructions:</Text> {activity.instructions && activity.instructions.join(', ')}
+</Text> */}
+
+<Text style={{ fontWeight: 'bold', fontSize: 18, marginBottom: 8 }}>Instructions:</Text>
+      {activity.instructions &&
+        activity.instructions.map((instruction, index) => (
+          <Text key={index} style={{ fontSize: 16, marginBottom: 4 }}>
+            {index + 1}. {instruction}
+          </Text>
+        ))}
+
+
+<Text style={{ fontWeight: 'bold', fontSize: 18, marginBottom: 8 }}>Tips:</Text>
+      {activity.instructions &&
+        activity.tips.map((tips, index) => (
+          <Text key={index} style={{ fontSize: 16, marginBottom: 4 }}>
+            {index + 1}. {tips}
+          </Text>
+        ))}
+
+
+
+
+
+
+{/* <Text style={tw`text-lg mb-4 text-gray-700`}>
+  <Text style={tw`font-bold`}>Tips:</Text> {activity.tips && activity.tips.join(', ')}
+</Text> */}
+
+<Text style={tw`text-lg mb-4 text-gray-700`}>
+  <Text style={tw`font-bold`}>Status:</Text>
+</Text>
+{activity.status &&
+  activity.status.map((statusItem, index) => (
+    <Text key={index} style={tw`text-lg text-gray-700`}>
+      {statusItem.status} - {statusItem.modifiedAt}
+    </Text>
+  ))}
             </ScrollView>
           </View>
           </View>
