@@ -216,9 +216,10 @@ const TinkeringActivityReportBoxComponent = ({ activity }: { activity: Tinkering
 
 {activity.status && activity.status.length > 0 && (
   <>
+    <Text style={tw`text-lg text-gray-700 font-bold`}>Status :</Text>
     {activity.status.map((statusItem, index) => (
       <Text key={index} style={tw`text-lg text-gray-700`}>
-        <Text style={tw`font-bold`}>Status:</Text> {statusItem.status}-{statusItem.modifiedAt}
+        <Text style={tw`font-bold`}>{index + 1}.</Text> {statusItem.status} - {statusItem.modifiedAt}
       </Text>
     ))}
   </>
