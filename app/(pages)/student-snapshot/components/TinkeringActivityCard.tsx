@@ -116,13 +116,30 @@ const TinkeringActivityReportBoxComponent = ({ activity }: { activity: Tinkering
     </View> */}
             
         {/* <Text style={tw`text-3xl font-bold text-blue-900 mb-2`}>{activity.taName}</Text> */}
-        <Text style={tw`text-lg font-bold text-blue-700 mb-2`}>{activity.taName}</Text>
+
+        {/* for spacing between taname and Introduction */}
+        {activity.taName && (
+
+        <Text style={tw`text-lg font-bold text-blue-700 mb-1 leading-tight`}>
+  {activity.taName}
+</Text>
+        )}
+
+{activity.intro && (
+  <Text style={tw`text-lg text-gray-700 leading-tight`}>
+    <Text style={tw`font-bold`}>Introduction:</Text> {activity.intro}
+  </Text>
+)}
+
+{/* // change here ta */}
+        {/* <Text style={tw`text-lg font-bold text-blue-700 mb-2`}>{activity.taName}</Text> */}
 
               {/* <Text style={tw`text-xl font-bold text-blue-700 mb-2`}>{activity.taName}</Text> */}
+              {/* //change here today 03
               <Text style={tw`text-lg mb-4 text-gray-700`}>
               <Text style={tw`font-bold`}>Introduction:</Text> {activity.intro}
 
-                </Text> 
+                </Text>  */}
               {/* <Text style={tw`text-lg my-4 text-gray-700`}>Subject: {activity.subject}</Text>
               <Text style={tw`text-lg my-4 text-gray-700`}>Topic: {activity.topic}</Text>
               <Text style={tw`text-lg my-4 text-gray-700`}>Sub-Topic: {activity.subTopic}</Text> */}
@@ -132,15 +149,16 @@ const TinkeringActivityReportBoxComponent = ({ activity }: { activity: Tinkering
   <Text style={tw`font-bold`}>Goals:</Text> {activity.goals && activity.goals.join(', ')}
 </Text> */}
 
-
-<Text style={{ fontWeight: 'bold', fontSize: 18, marginBottom: 8 }}>Goals:</Text>
-      {activity.goals &&
-        activity.goals.map((goals, index) => (
-          <Text key={index} style={{ fontSize: 16, marginBottom: 4 }}>
-            {index + 1}. {goals}
-          </Text>
-        ))}
-
+{activity.goals && activity.goals.length > 0 && (
+  <>
+    <Text style={{ fontWeight: 'bold', fontSize: 18, marginBottom: 8 }}>Goals:</Text>
+    {activity.goals.map((goal, index) => (
+      <Text key={index} style={{ fontSize: 16, marginBottom: 4 }}>
+        {index + 1}. {goal}
+      </Text>
+    ))}
+  </>
+)}
 
 
 {/* <Text style={tw`text-lg mb-4 text-gray-700`}>
@@ -148,35 +166,44 @@ const TinkeringActivityReportBoxComponent = ({ activity }: { activity: Tinkering
 </Text> */}
 
 
-<Text style={{ fontWeight: 'bold', fontSize: 18, marginBottom: 8 }}>Materials:</Text>
-      {activity.materials &&
-        activity.materials.map((materials, index) => (
-          <Text key={index} style={{ fontSize: 16, marginBottom: 4 }}>
-            {index + 1}. {materials}
-          </Text>
-        ))}
+{activity.materials && activity.materials.length > 0 && (
+  <>
+    <Text style={{ fontWeight: 'bold', fontSize: 18, marginBottom: 8 }}>Materials:</Text>
+    {activity.materials.map((material, index) => (
+      <Text key={index} style={{ fontSize: 16, marginBottom: 4 }}>
+        {index + 1}. {material}
+      </Text>
+    ))}
+  </>
+)}
 
 
 {/* <Text style={tw`text-lg mb-4 text-gray-700`}>
   <Text style={tw`font-bold`}>Instructions:</Text> {activity.instructions && activity.instructions.join(', ')}
 </Text> */}
 
-<Text style={{ fontWeight: 'bold', fontSize: 18, marginBottom: 8 }}>Instructions:</Text>
-      {activity.instructions &&
-        activity.instructions.map((instruction, index) => (
-          <Text key={index} style={{ fontSize: 16, marginBottom: 4 }}>
-            {index + 1}. {instruction}
-          </Text>
-        ))}
+{activity.instructions && activity.instructions.length > 0 && (
+  <>
+    <Text style={{ fontWeight: 'bold', fontSize: 18, marginBottom: 8 }}>Instructions:</Text>
+    {activity.instructions.map((instruction, index) => (
+      <Text key={index} style={{ fontSize: 16, marginBottom: 4 }}>
+        {index + 1}. {instruction}
+      </Text>
+    ))}
+  </>
+)}
 
 
-<Text style={{ fontWeight: 'bold', fontSize: 18, marginBottom: 8 }}>Tips:</Text>
-      {activity.instructions &&
-        activity.tips.map((tips, index) => (
-          <Text key={index} style={{ fontSize: 16, marginBottom: 4 }}>
-            {index + 1}. {tips}
-          </Text>
-        ))}
+{activity.tips && activity.tips.length > 0 && (
+  <>
+    <Text style={{ fontWeight: 'bold', fontSize: 18, marginBottom: 8 }}>Tips:</Text>
+    {activity.tips.map((tip, index) => (
+      <Text key={index} style={{ fontSize: 16, marginBottom: 4 }}>
+        {index + 1}. {tip}
+      </Text>
+    ))}
+  </>
+)}
 
 
 
@@ -187,15 +214,15 @@ const TinkeringActivityReportBoxComponent = ({ activity }: { activity: Tinkering
   <Text style={tw`font-bold`}>Tips:</Text> {activity.tips && activity.tips.join(', ')}
 </Text> */}
 
-<Text style={tw`text-lg mb-4 text-gray-700`}>
-  <Text style={tw`font-bold`}>Status:</Text>
-</Text>
-{activity.status &&
-  activity.status.map((statusItem, index) => (
-    <Text key={index} style={tw`text-lg text-gray-700`}>
-      {statusItem.status} - {statusItem.modifiedAt}
-    </Text>
-  ))}
+{activity.status && activity.status.length > 0 && (
+  <>
+    {activity.status.map((statusItem, index) => (
+      <Text key={index} style={tw`text-lg text-gray-700`}>
+        <Text style={tw`font-bold`}>Status:</Text> {statusItem.status}-{statusItem.modifiedAt}
+      </Text>
+    ))}
+  </>
+)}
             </ScrollView>
           </View>
           </View>
